@@ -9,10 +9,14 @@ Implementation of the following loss functions:
 
 from torch.nn import functional as F
 from Losses.focal_loss import FocalLoss
+from Losses.iq import IQLoss
 from Losses.focal_loss_adaptive_gamma import FocalLossAdaptive
 from Losses.mmce import MMCE, MMCE_weighted
 from Losses.brier_score import BrierScore
 
+
+def iq_loss(logits, targets, **kwargs):
+    return IQLoss(gamma=kwargs['gamma'])(logits, targets)
 
 def cross_entropy(logits, targets, **kwargs):
     return F.cross_entropy(logits, targets, reduction='sum')
