@@ -23,7 +23,7 @@ from Net.wide_resnet import wide_resnet_cifar
 from Net.densenet import densenet121
 
 # Import loss functions
-from Losses.loss import cross_entropy, focal_loss, focal_loss_adaptive
+from Losses.loss import cross_entropy, focal_loss, focal_loss_adaptive, iq_loss
 from Losses.loss import mmce, mmce_weighted
 from Losses.loss import brier_score
 
@@ -65,6 +65,7 @@ def loss_function_save_name(loss_function,
                             lamda=1.0):
     res_dict = {
         'cross_entropy': 'cross_entropy',
+        'iq_loss': 'iq_loss_alpha_'+ str(lamda),
         'focal_loss': 'focal_loss_gamma_' + str(gamma),
         'focal_loss_adaptive': 'focal_loss_adaptive_gamma_' + str(gamma),
         'mmce': 'mmce_lamda_' + str(lamda),
