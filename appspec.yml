@@ -2,20 +2,20 @@ version: 0.0
 os: linux
 files:
   - source: Config/config.txt
-    destination: /Users/royyuan/Desktop
+    destination: /Users/royyuan/Desktop/script_stuff
   - source: source
-    destination: /Users/royyuan/Desktop
+    destination: /Users/royyuan/Desktop/script_stuff
 hooks:
   BeforeInstall:
-    - location: Scripts/UnzipResourceBundle.sh
-    - location: Scripts/UnzipDataBundle.sh
+    - location: /Users/royyuan/Desktop/script_stuff
+    - location: /Users/royyuan/Desktop/script_stuff
   AfterInstall:
-    - location: Scripts/RunResourceTests.sh
+    - location: /Users/royyuan/Desktop/script_stuff
       timeout: 180
   ApplicationStart:
-    - location: Scripts/RunFunctionalTests.sh
+    - location: /Users/royyuan/Desktop/script_stuff
       timeout: 3600
   ValidateService:
-    - location: Scripts/MonitorService.sh
+    - location: /Users/royyuan/Desktop/script_stuff
       timeout: 3600
       runas: codedeployuser
