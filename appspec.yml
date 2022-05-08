@@ -2,20 +2,20 @@ version: 0.0
 os: linux
 files:
   - source: Config/config.txt
-    destination: /Users/royyuan/Desktop/script_stuff
+    destination: /Users/royyuan/Desktop/focal_calibration_project
   - source: source
-    destination: /Users/royyuan/Desktop/script_stuff
+    destination: /Users/royyuan/Desktop/focal_calibration_project
 hooks:
   BeforeInstall:
-    - location: /Users/royyuan/Desktop/script_stuff
-    - location: /Users/royyuan/Desktop/script_stuff
+    - location: /Users/royyuan/Desktop/focal_calibration_project
+    - location: /Users/royyuan/Desktop/focal_calibration_project
   AfterInstall:
-    - location: /Users/royyuan/Desktop/script_stuff
+    - location: /Users/royyuan/Desktop/focal_calibration_project
       timeout: 180
   ApplicationStart:
-    - location: /Users/royyuan/Desktop/script_stuff
+    - location: /Users/royyuan/Desktop/focal_calibration_project
       timeout: 3600
   ValidateService:
-    - location: /Users/royyuan/Desktop/script_stuff
+    - location: /Users/royyuan/Desktop/focal_calibration_project
       timeout: 3600
       runas: codedeployuser
