@@ -2,9 +2,9 @@ version: 0.0
 os: linux
 files:
   - source: Config/config.txt
-    destination: /webapps/Config
+    destination: /Users/royyuan/Desktop
   - source: source
-    destination: /webapps/myApp
+    destination: /Users/royyuan/Desktop
 hooks:
   BeforeInstall:
     - location: Scripts/UnzipResourceBundle.sh
