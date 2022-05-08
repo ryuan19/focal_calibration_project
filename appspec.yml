@@ -2,9 +2,9 @@ version: 0.0
 os: linux
 files:
   - source: Config/config.txt
-    destination: /Users/royyuan/Desktop/focal_calibration_project
+    destination: /webapps/Config
   - source: source
-    destination: /Users/royyuan/Desktop/focal_calibration_project
+    destination: /webapps/myApp
 hooks:
   BeforeInstall:
     - location: Scripts/UnzipResourceBundle.sh
