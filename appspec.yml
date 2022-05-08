@@ -2,9 +2,9 @@ version: 0.0
 os: linux
 files:
   - source: Config/config.txt
-    destination: /opt/codedeploy-agent/deployment-root/009bbd19-8492-4c00-8b78-8152604b5a99/d-6EY8GR0PG/deployment-archive/Scripts/
+    destination: /opt/codedeploy-agent/deployment-root/009bbd19-8492-4c00-8b78-8152604b5a99/d-REHIKE0PG/deployment-archive/Scripts/UnzipResourceBundle.sh
   - source: source
-    destination: /opt/codedeploy-agent/deployment-root/009bbd19-8492-4c00-8b78-8152604b5a99/d-6EY8GR0PG/deployment-archive/Scripts/
+    destination:/opt/codedeploy-agent/deployment-root/009bbd19-8492-4c00-8b78-8152604b5a99/d-REHIKE0PG/deployment-archive/Scripts/UnzipResourceBundle.sh
 hooks:
   BeforeInstall:
     - location: Scripts/UnzipResourceBundle.sh
