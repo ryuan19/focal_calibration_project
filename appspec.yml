@@ -7,15 +7,15 @@ files:
     destination: /Users/royyuan/Desktop/focal_calibration_project
 hooks:
   BeforeInstall:
-    - location: /Users/royyuan/Desktop/focal_calibration_project
-    - location: /Users/royyuan/Desktop/focal_calibration_project
+    - location: Scripts/UnzipResourceBundle.sh
+    - location: Scripts/UnzipDataBundle.sh
   AfterInstall:
-    - location: /Users/royyuan/Desktop/focal_calibration_project
+    - location: Scripts/RunResourceTests.sh
       timeout: 180
   ApplicationStart:
-    - location: /Users/royyuan/Desktop/focal_calibration_project
+    - location: Scripts/RunFunctionalTests.sh
       timeout: 3600
   ValidateService:
-    - location: /Users/royyuan/Desktop/focal_calibration_project
+    - location: Scripts/MonitorService.sh
       timeout: 3600
       runas: codedeployuser
