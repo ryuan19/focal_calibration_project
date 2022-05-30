@@ -1,3 +1,7 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.autograd import Variable
 
 class FocalLoss(nn.Module):
     def __init__(self, div="chi", alpha=0.5, lambda_gp=0, size_average=True):
@@ -8,7 +12,7 @@ class FocalLoss(nn.Module):
         self.size_average = size_average
     
     def forward(self, input, target):
-         if input.dim()>2:
+        if input.dim()>2:
             input = input.view(input.size(0),input.size(1),-1)  # N,C,H,W => N,C,H*W
             input = input.transpose(1,2)    # N,C,H*W => N,H*W,C
             input = input.contiguous().view(-1,input.size(2))   # N,H*W,C => N*H*W,C
@@ -80,9 +84,9 @@ def iq_loss(self, logits, targets):
 
     loss_dict['total_loss'] = loss.mean().item()
     
-     if self.size_average: 
+    if self.size_average: 
         loss = loss.mean()
-      else:
+    else:
         loss = loss.sum()
       
     return loss, loss_dict
