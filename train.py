@@ -100,7 +100,7 @@ def parseArgs():
     saved_model_name = "resnet50_cross_entropy_350.model"
     load_loc = './'
     model = "resnet50"
-    epoch = 350
+    epoch = 10
     first_milestone = 150 #Milestone for change in lr
     second_milestone = 250 #Milestone for change in lr
     gamma_schedule_step1 = 100
