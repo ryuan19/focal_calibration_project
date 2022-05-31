@@ -8,7 +8,7 @@ from torch import nn
 
 from Losses.loss import cross_entropy, focal_loss, focal_loss_adaptive
 from Losses.loss import mmce, mmce_weighted
-from Losses.loss import brier_score
+from Losses.loss import brier_score, iq_loss
 
 
 loss_function_dict = {
@@ -17,7 +17,8 @@ loss_function_dict = {
     'focal_loss_adaptive': focal_loss_adaptive,
     'mmce': mmce,
     'mmce_weighted': mmce_weighted,
-    'brier_score': brier_score
+    'brier_score': brier_score,
+    'iq_loss': iq_loss
 }
 
 
