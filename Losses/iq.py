@@ -26,6 +26,7 @@ def iq_loss(self, logits, targets):
   
     # keep track of logZ
     v0 = torch.logsumexp(logits, dim=1).mean()
+    loss_dict = {}
     loss_dict['LogZ'] = v0.item()
 
     #  calculate 1st term for IQ loss
