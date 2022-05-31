@@ -3,9 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-class FocalLoss(nn.Module):
+class IQLoss(nn.Module):
     def __init__(self, div="chi", alpha=0.5, lambda_gp=0, size_average=True):
-        super(FocalLoss, self).__init__()
+        super(IQLoss, self).__init__()
         self.div = div
         self.alpha = alpha
         self.lambda_gp = lambda_gp
