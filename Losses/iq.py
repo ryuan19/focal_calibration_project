@@ -4,9 +4,10 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 class IQLoss(nn.Module):
-    def __init__(self, div="chi", alpha=0.5, lambda_gp=0, size_average=True):
+    def __init__(self, div="chi", gamma=0, alpha=0.5, lambda_gp=0, size_average=True):
         super(IQLoss, self).__init__()
         self.div = div
+        self.gamma = gamma
         self.alpha = alpha
         self.lambda_gp = lambda_gp
         self.size_average = size_average
