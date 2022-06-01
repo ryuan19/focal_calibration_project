@@ -10,6 +10,7 @@ import torch.backends.cudnn as cudnn
 import random
 import json
 import sys
+import wandb
 
 # Import dataloaders
 import Data.cifar10 as cifar10
@@ -65,7 +66,7 @@ def loss_function_save_name(loss_function,
                             lamda=1.0):
     res_dict = {
         'cross_entropy': 'cross_entropy',
-        'iq_loss': 'iq_loss_alpha_'+ str(lamda),
+        'iq_loss': 'iq_loss_alpha_' + str(lamda),
         'focal_loss': 'focal_loss_gamma_' + str(gamma),
         'focal_loss_adaptive': 'focal_loss_adaptive_gamma_' + str(gamma),
         'mmce': 'mmce_lamda_' + str(lamda),
@@ -88,6 +89,7 @@ def parseArgs():
     momentum = 0.9
     optimiser = "sgd"
     loss = "cross_entropy"
+    div = "chi"
     gamma = 1.0
     gamma2 = 1.0
     gamma3 = 1.0
@@ -100,9 +102,9 @@ def parseArgs():
     saved_model_name = "resnet50_cross_entropy_350.model"
     load_loc = './'
     model = "resnet50"
-    epoch = 10
-    first_milestone = 150 #Milestone for change in lr
-    second_milestone = 250 #Milestone for change in lr
+    epoch = 350
+    first_milestone = 150  # Milestone for change in lr
+    second_milestone = 250  # Milestone for change in lr
     gamma_schedule_step1 = 100
     gamma_schedule_step2 = 250
 
@@ -146,6 +148,8 @@ def parseArgs():
     parser.add_argument("--loss-mean", action="store_true", dest="loss_mean",
                         help="whether to take mean of loss instead of sum to train")
     parser.set_defaults(loss_mean=False)
+    parser.add_argument("--div", type=str, default=div,
+                        dest="div", help="Divergence for IQ loss components")
     parser.add_argument("--gamma", type=float, default=gamma,
                         dest="gamma", help="Gamma for focal components")
     parser.add_argument("--gamma2", type=float, default=gamma2,
@@ -188,16 +192,15 @@ def parseArgs():
 
 
 if __name__ == "__main__":
-
     torch.manual_seed(1)
     args = parseArgs()
+    wandb.init(project='focal_loss', config=args)
 
     cuda = False
     if (torch.cuda.is_available() and args.gpu):
         cuda = True
     device = torch.device("cuda" if cuda else "cpu")
     print("CUDA set: " + str(cuda))
-
 
     num_classes = dataset_num_classes[args.dataset]
 
@@ -207,7 +210,6 @@ if __name__ == "__main__":
     # Setting model name
     if args.model_name is None:
         args.model_name = args.model
-
 
     if args.gpu is True:
         net.cuda()
@@ -219,7 +221,8 @@ if __name__ == "__main__":
     num_epochs = args.epoch
     if args.load:
         net.load_state_dict(torch.load(args.save_loc + args.saved_model_name))
-        start_epoch = int(args.saved_model_name[args.saved_model_name.rfind('_')+1:args.saved_model_name.rfind('.model')])
+        start_epoch = int(args.saved_model_name[args.saved_model_name.rfind(
+            '_')+1:args.saved_model_name.rfind('.model')])
 
     if args.optimiser == "sgd":
         opt_params = net.parameters()
@@ -233,7 +236,8 @@ if __name__ == "__main__":
         optimizer = optim.Adam(opt_params,
                                lr=args.learning_rate,
                                weight_decay=args.weight_decay)
-    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[args.first_milestone, args.second_milestone], gamma=0.1)
+    scheduler = optim.lr_scheduler.MultiStepLR(
+        optimizer, milestones=[args.first_milestone, args.second_milestone], gamma=0.1)
 
     if (args.dataset == 'tiny_imagenet'):
         train_loader = dataset_loader[args.dataset].get_data_loader(
@@ -286,6 +290,7 @@ if __name__ == "__main__":
                 gamma = args.gamma3
         else:
             gamma = args.gamma
+            div = args.div
 
         train_loss = train_single_epoch(epoch,
                                         net,
@@ -294,6 +299,7 @@ if __name__ == "__main__":
                                         device,
                                         loss_function=args.loss_function,
                                         gamma=gamma,
+                                        div=div,
                                         lamda=args.lamda,
                                         loss_mean=args.loss_mean)
         val_loss = test_single_epoch(epoch,
@@ -302,6 +308,7 @@ if __name__ == "__main__":
                                      device,
                                      loss_function=args.loss_function,
                                      gamma=gamma,
+                                     div=div,
                                      lamda=args.lamda)
         test_loss = test_single_epoch(epoch,
                                       net,
@@ -309,6 +316,7 @@ if __name__ == "__main__":
                                       device,
                                       loss_function=args.loss_function,
                                       gamma=gamma,
+                                      div=div,
                                       lamda=args.lamda)
         _, val_acc, _, _, _ = test_classification_net(net, val_loader, device)
 
@@ -317,23 +325,30 @@ if __name__ == "__main__":
         test_set_loss[epoch] = test_loss
         val_set_err[epoch] = 1 - val_acc
 
+        wandb.log({"training_set_loss": train_loss,
+                   "val_set_loss": val_loss,
+                   "test_set_loss": test_loss,
+                   "val_set_err": (1 - val_acc),
+                   }, step=epoch)
+
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             print('New best error: %.4f' % (1 - best_val_acc))
+            wandb.log({"best_val_acc": val_acc}, step=epoch)
+
             save_name = args.save_loc + \
-                        args.model_name + '_' + \
-                        loss_function_save_name(args.loss_function, args.gamma_schedule, gamma, args.gamma, args.gamma2, args.gamma3, args.lamda) + \
-                        '_best_' + \
-                        str(epoch + 1) + '.model'
+                args.model_name + '_' + \
+                loss_function_save_name(args.loss_function, args.gamma_schedule, gamma, args.gamma, args.gamma2, args.gamma3, args.lamda) + \
+                '_best_' + \
+                str(epoch + 1) + '.model'
             torch.save(net.state_dict(), save_name)
 
         if (epoch + 1) % args.save_interval == 0:
             save_name = args.save_loc + \
-                        args.model_name + '_' + \
-                        loss_function_save_name(args.loss_function, args.gamma_schedule, gamma, args.gamma, args.gamma2, args.gamma3, args.lamda) + \
-                        '_' + str(epoch + 1) + '.model'
+                args.model_name + '_' + \
+                loss_function_save_name(args.loss_function, args.gamma_schedule, gamma, args.gamma, args.gamma2, args.gamma3, args.lamda) + \
+                '_' + str(epoch + 1) + '.model'
             torch.save(net.state_dict(), save_name)
-
 
     with open(save_name[:save_name.rfind('_')] + '_train_loss.json', 'a') as f:
         json.dump(training_set_loss, f)
