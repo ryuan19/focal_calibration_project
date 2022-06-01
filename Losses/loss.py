@@ -16,7 +16,7 @@ from Losses.brier_score import BrierScore
 
 
 def iq_loss(logits, targets, **kwargs):
-    return IQLoss(gamma=kwargs['gamma'])(logits, targets)
+    return IQLoss(gamma=kwargs['gamma'], div=kwargs['div'])(logits, targets)
 
 def cross_entropy(logits, targets, **kwargs):
     return F.cross_entropy(logits, targets, reduction='sum')

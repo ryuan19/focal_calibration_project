@@ -30,6 +30,7 @@ def train_single_epoch(epoch,
                        loss_function='cross_entropy',
                        gamma=1.0,
                        lamda=1.0,
+                       div='chi',
                        loss_mean=False):
     '''
     Util method for training a model for a single epoch.
@@ -46,15 +47,17 @@ def train_single_epoch(epoch,
 
         logits = model(data)
         if ('mmce' in loss_function):
-            loss = (len(data) * loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda, device=device))
+            loss = (len(data) * loss_function_dict[loss_function]
+                    (logits, labels, gamma=gamma, lamda=lamda, device=device))
         else:
-            loss = loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda, device=device)
+            loss = loss_function_dict[loss_function](logits, labels, gamma=gamma, div=div, lamda=lamda, device=device)
 
         if loss_mean:
             loss = loss / len(data)
 
         loss.backward()
-        torch.nn.utils.clip_grad_norm(model.parameters(), 2)
+        # Don't clip grad norms
+        # torch.nn.utils.clip_grad_norm(model.parameters(), 2)
         train_loss += loss.item()
         optimizer.step()
         num_samples += len(data)
@@ -70,13 +73,13 @@ def train_single_epoch(epoch,
     return train_loss / num_samples
 
 
-
 def test_single_epoch(epoch,
                       model,
                       test_val_loader,
                       device,
                       loss_function='cross_entropy',
                       gamma=1.0,
+                      div=None,
                       lamda=1.0):
     '''
     Util method for testing a model for a single epoch.
@@ -91,9 +94,11 @@ def test_single_epoch(epoch,
 
             logits = model(data)
             if ('mmce' in loss_function):
-                loss += (len(data) * loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda, device=device).item())
+                loss += (len(data) * loss_function_dict[loss_function](logits,
+                         labels, gamma=gamma, lamda=lamda, device=device).item())
             else:
-                loss += loss_function_dict[loss_function](logits, labels, gamma=gamma, lamda=lamda, device=device).item()
+                loss += loss_function_dict[loss_function](logits, labels,
+                                                          gamma=gamma, div=div, lamda=lamda, device=device).item()
             num_samples += len(data)
 
     print('======> Test set loss: {:.4f}'.format(
